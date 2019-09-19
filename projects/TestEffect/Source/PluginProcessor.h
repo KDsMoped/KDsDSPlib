@@ -11,12 +11,12 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-//#include "DSPlib.h"
+#include "DSPlib.h"
 
 //==============================================================================
 /**
 */
-class TestEffectAudioProcessor  : public AudioProcessor
+class TestEffectAudioProcessor  : public AudioProcessor, AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -55,8 +55,21 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+	
+	//==============================================================================	
+	void parameterChanged(const String &parameterID, float newValue) override;
+
+	//==============================================================================	
+	AudioProcessorValueTreeState vtState;
 
 private:
     //==============================================================================
+
+
+	AudioProcessorValueTreeState::ParameterLayout createParamLayout();
+
+	std::vector<kdsp::BiquadFilterDF2<double>*> filters;
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TestEffectAudioProcessor)
 };

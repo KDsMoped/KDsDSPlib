@@ -15,9 +15,30 @@
 TestEffectAudioProcessorEditor::TestEffectAudioProcessorEditor (TestEffectAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+	setSize(400, 300);
+
+	freqSlider.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+	freqSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 100, 25);
+	freqSlider.setNormalisableRange(NormalisableRange<double>(
+			processor.vtState.getParameterRange("freq").start,
+			processor.vtState.getParameterRange("freq").end,
+			processor.vtState.getParameterRange("freq").interval,
+			processor.vtState.getParameterRange("freq").skew
+		)
+	);
+	addAndMakeVisible(freqSlider);
+	freqSliderAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.vtState, "freq", freqSlider);
+
+	qSlider.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+	qSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 100, 25);
+	qSlider.setNormalisableRange(NormalisableRange<double>(
+		processor.vtState.getParameterRange("q").start,
+		processor.vtState.getParameterRange("q").end,
+		processor.vtState.getParameterRange("q").interval
+		)
+	);
+	addAndMakeVisible(qSlider);
+	qSliderAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.vtState, "q", qSlider);
 }
 
 TestEffectAudioProcessorEditor::~TestEffectAudioProcessorEditor()
@@ -32,11 +53,17 @@ void TestEffectAudioProcessorEditor::paint (Graphics& g)
 
     g.setColour (Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
+    g.drawFittedText ("Filter Test", getLocalBounds(), Justification::centredTop, 1);
 }
 
 void TestEffectAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+	Rectangle<int> sliderBounds(100, 100);
+	sliderBounds.setCentre(getBounds().getCentre());
+	sliderBounds.translate(-100, 0);
+	freqSlider.setBounds(sliderBounds);
+
+	sliderBounds.setCentre(getBounds().getCentre());
+	sliderBounds.translate(100, 0);
+	qSlider.setBounds(sliderBounds);
 }
